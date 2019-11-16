@@ -1,0 +1,7 @@
+@media (max-width: 1199.98px) {
+    #login-btn, #register-btn {
+        width: 100px;
+        margin-top: 8px;
+        margin-bottom: 8px;
+    }
+}
