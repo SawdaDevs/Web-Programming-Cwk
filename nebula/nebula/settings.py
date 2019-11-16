@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'webay'
 ]
 
 MIDDLEWARE = [
@@ -119,3 +120,5 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+# After login, redirect to
+LOGIN_REDIRECT_URL = '/profile'
