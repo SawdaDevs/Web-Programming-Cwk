@@ -1,6 +1,6 @@
 from django.contrib.auth import logout as django_logout
 from django.shortcuts import render, redirect
-from webay.forms import UserForm, UserProfileForm, ProfileImageForm, LoginForm
+from webay.forms import UserForm, UserProfileForm, ProfileImageForm
 from django.contrib.auth.decorators import login_required
 
 # Create your views here.
@@ -41,6 +41,7 @@ def register(request):
 
 
 def profile(request):
+    print(request.user.username)
     return render(request, 'webay/profile.html')
 
 
