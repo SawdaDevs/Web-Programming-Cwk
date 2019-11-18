@@ -12,14 +12,14 @@ class Item(models.Model):
     base_price = models.DecimalField(max_digits=5, decimal_places=2)
     start_datetime = models.DateTimeField('%d/%m/%Y %H:%M:%S')
     end_datetime = models.DateTimeField('%d/%m/%Y %H:%M:%S')
-    user = models.ForeignKey('UserProfile', on_delete=models.PROTECT)
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
 
 
 class Bid(models.Model):
     amount = models.DecimalField(max_digits=5, decimal_places=2)
     bid_datetime = models.DateTimeField('%d/%m/%Y %H:%M:%S')
     item = models.OneToOneField(Item, on_delete=models.PROTECT)
-    user = models.OneToOneField('UserProfile', on_delete=models.PROTECT)
+    user = models.OneToOneField(User, on_delete=models.PROTECT)
 
 
 class UserProfile(models.Model):
