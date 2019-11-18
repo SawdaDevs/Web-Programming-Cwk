@@ -13,6 +13,7 @@ class Item(models.Model):
     start_datetime = models.DateTimeField('%d/%m/%Y %H:%M:%S')
     end_datetime = models.DateTimeField('%d/%m/%Y %H:%M:%S')
     user = models.ForeignKey(User, on_delete=models.PROTECT)
+    winner_notified = models.BooleanField()
 
 
 class Bid(models.Model):
@@ -29,3 +30,10 @@ class UserProfile(models.Model):
     address = models.CharField(max_length=255)
     mobile_regex = RegexValidator(regex=r'^0\d{10}$', message='Mobile number must be a valid 11 digit UK number.')
     mobile = models.CharField(validators=[mobile_regex], max_length=11)
+
+
+class Message(models.Model):
+    recipient = models.OneToOneField(User, on_delete=models.CASCADE, related_name='message')
+    message = models.TextField()
+    email_sent = models.BooleanField()
+    read_message = models.BooleanField()
