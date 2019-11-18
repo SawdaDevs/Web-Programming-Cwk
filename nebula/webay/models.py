@@ -32,8 +32,8 @@ class UserProfile(models.Model):
     mobile = models.CharField(validators=[mobile_regex], max_length=11)
 
 
-class Message(models.Model):
-    recipient = models.OneToOneField(User, on_delete=models.CASCADE, related_name='message')
+class Notification(models.Model):
+    recipient = models.OneToOneField(User, on_delete=models.CASCADE, related_name='notification')
     message = models.TextField()
     email_sent = models.BooleanField()
     read_message = models.BooleanField()
