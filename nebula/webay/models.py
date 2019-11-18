@@ -23,7 +23,7 @@ class Bid(models.Model):
 
 
 class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     dob = models.DateField()
     profile_pic = models.ImageField(default='default.jpg', upload_to='webay/media/profile_pics')
     address = models.CharField(max_length=255)

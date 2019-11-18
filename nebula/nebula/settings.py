@@ -122,3 +122,7 @@ STATIC_URL = '/static/'
 
 # After login, redirect to
 LOGIN_REDIRECT_URL = '/profile'
+# Media files
+MEDIA_DIR = os.path.join(BASE_DIR,'webay/media')
+MEDIA_ROOT = MEDIA_DIR
+MEDIA_URL = '/'
