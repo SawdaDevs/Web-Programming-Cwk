@@ -108,6 +108,3 @@ venv.bak/
 
 # mac trash
 .DS_Store
-
-# media files
-media/
