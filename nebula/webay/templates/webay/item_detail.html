@@ -1,0 +1,34 @@
+{% extends 'webay/base.html' %}
+  {% block body_block %}
+    <article class="media content-section">
+      <img class="rounded-circle article-img" src="{{ object.author.profile.image.url }}">
+        <div class="media-body">
+          <div class="article-metadata">
+            <a class="mr-2" href="#">{{ object.user }}</a>
+            <small class="text-muted">{{ object.start_datetime|date:"F d, Y" }}</small>
+            {% if object.user == user %}
+              <div>
+                <a class="btn btn-secondary btn-sm mt-1 mb-1" href="#">Update Project Details</a>
+                <a class="btn btn-danger btn-sm mt-1 mb-1" onclick='delete()'>Delete Project</a>
+              </div>
+            {% endif %}
+          </div>
+          <h2 class="article-title">{{ object.title }}</h2>
+          <img src="{{ object.item_pic.url }}" height="300" width="100%"">
+          <p class="article-content">{{ object.description }}</p>
+        </div>
+    </article>
+  {% endblock %}
+
+<script type="text/javascript">
+  function delete(event){
+          url="delete_item/"
+          $.ajax ({
+            url : url+(object.id), // item id
+            method : "DELETE",
+            success : function (data){
+              console.log(data)
+            }
+          })
+        }
+</script>

@@ -2,13 +2,30 @@ from django.contrib.auth import logout as django_logout
 from django.shortcuts import render, redirect
 from webay.forms import UserForm, UserProfileForm, ProfileImageForm
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
 
-# Create your views here.
+from django.views.generic import ListView, DetailView
 
+from .models import Item
 
 def index(request):
     return render(request, 'webay/base.html')
 
+def auctions(request):
+    context = {
+        'items': Item.objects.all()
+    }
+    return render(request, 'webay/auctions.html', context)
+
+@csrf_exempt
+def delete_project(request,id):
+    if request.method == 'DELETE':
+        to_delete = Item.objects.filter(id=id)
+        to_delete.delete()
+    return JsonResponse({'message':"deleted!"}, safe=False)
+
+class ItemDetailView(DetailView):
+    model = Item
 
 def register(request):
     registered = False

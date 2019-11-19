@@ -15,6 +15,8 @@ class Item(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     winner_notified = models.BooleanField()
 
+    def __str__(self):
+        return self.title
 
 class Bid(models.Model):
     amount = models.DecimalField(max_digits=5, decimal_places=2)
@@ -31,6 +33,8 @@ class UserProfile(models.Model):
     mobile_regex = RegexValidator(regex=r'^0\d{10}$', message='Mobile number must be a valid 11 digit UK number.')
     mobile = models.CharField(validators=[mobile_regex], max_length=11)
 
+    def __str__(self):
+        return self.user.username
 
 class Message(models.Model):
     recipient = models.OneToOneField(User, on_delete=models.CASCADE, related_name='message')
