@@ -1,6 +1,7 @@
 from django.contrib.auth import logout as django_logout
 from django.shortcuts import render, redirect
 from webay.forms import UserForm, UserProfileForm, ProfileImageForm, LoginForm
+from webay.models import UserProfile, User
 from django.contrib.auth.decorators import login_required
 
 # Create your views here.
@@ -39,9 +40,49 @@ def register(request):
                    'registered': registered
                    })
 
-
+@login_required
 def profile(request):
-    return render(request, 'webay/profile.html')
+    if request.method =='POST':
+        first_name = request.POST['first_name']
+        last_name = request.POST['last_name']
+        mobile = request.POST['mobile']
+        email = request.POST['email']
+        address = request.POST['address']
+
+
+
+        profile = UserProfile.objects.get(user=request.user)
+        user = User.objects.get(id=request.user.id)
+        user.first_name = first_name
+        user.last_name = last_name
+        user.email = email
+        profile.mobile = mobile
+        profile.address = address
+
+        user.save()
+        profile.save()
+
+        return redirect('webay:profile')
+
+
+    else:
+        profile = UserProfile.objects.get(user=request.user)
+    return render(request, 'webay/profile.html', {'profile': profile})
+
+
+@login_required
+def upload_image(request):
+    if 'img_file' in request.FILES:
+        image_file = request.FILES['img_file']
+        profile = UserProfile.objects.get(user=request.user)
+        if profile:
+            # if user doesn't have a profile yet
+            # need to create a profile first
+            profile.profile_pic = image_file
+            profile.save()
+        return HttpResponse(profile.profile_pic.url)
+    else:
+        raise Http404('Image file not received')
 
 
 @login_required
