@@ -19,8 +19,8 @@ class Item(models.Model):
 class Bid(models.Model):
     amount = models.DecimalField(max_digits=5, decimal_places=2)
     bid_datetime = models.DateTimeField('%d/%m/%Y %H:%M:%S')
-    item = models.OneToOneField(Item, on_delete=models.PROTECT)
-    user = models.OneToOneField(User, on_delete=models.PROTECT)
+    item = models.ForeignKey(Item, on_delete=models.PROTECT)
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
 
 
 class UserProfile(models.Model):
