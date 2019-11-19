@@ -85,6 +85,7 @@ def upload_image(request):
         raise Http404('Image file not received')
 
 
+
 @login_required
 def logout(request):
     django_logout(request)
