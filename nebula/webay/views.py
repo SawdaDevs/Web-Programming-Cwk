@@ -1,6 +1,6 @@
 from django.contrib.auth import logout as django_logout
 from django.shortcuts import render, redirect
-from webay.forms import UserForm, UserProfileForm, ProfileImageForm, LoginForm
+from webay.forms import UserForm, UserProfileForm, ProfileImageForm
 from webay.models import UserProfile, User
 from django.contrib.auth.decorators import login_required
 
