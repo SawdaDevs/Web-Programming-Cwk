@@ -1,7 +1,7 @@
 from django.contrib.auth import logout as django_logout
 from django.shortcuts import render, redirect
-from webay.forms import UserForm, UserProfileForm, ProfileImageForm, LoginForm
-from webay.models import UserProfile, User
+from webay.forms import UserForm, UserProfileForm, ProfileImageForm, ItemForm, ItemImageForm
+from webay.models import UserProfile, User, Item
 from django.contrib.auth.decorators import login_required
 
 # Create your views here.
@@ -67,8 +67,35 @@ def profile(request):
 
     else:
         profile = UserProfile.objects.get(user=request.user)
-    return render(request, 'webay/profile.html', {'profile': profile})
+    return render(request, 'webay/profile_form.html', {'profile': profile})
 
+
+@login_required
+def item(request):
+    if request.method =='POST':
+        title = request.POST['title']
+        description = request.POST['description']
+        base_price = request.POST['base_price']
+        start_datetime = request.POST['start_datetime']
+        end_datetime = request.POST['end_datetime']
+
+
+        item_form = ItemForm(data=request.POST)
+        item_pic = ItemImageForm(data=request.POST)
+
+        if item_form.is_valid():
+            item = item_form.save()
+            item.save()
+        else:
+            print(item_form.errors)
+    else:
+        item_form = ItemForm()
+
+    return render(request, 'webay/item.html',
+            {
+            'itemForm': ItemForm,
+            'ItemImageForm': ItemImageForm,
+            })
 
 @login_required
 def upload_image(request):
