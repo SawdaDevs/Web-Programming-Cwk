@@ -1,7 +1,9 @@
 $(document).ready(() => {
    $('#id_dob').attr('type', 'date');
-   $('#id_end_datetime').attr('type', 'datetime-local');
-
+   //$('#id_end_datetime').attr('type', 'datetime-local');
+   $("#id_end_datetime").datetimepicker({
+     format: 'd/m/Y H:i',
+   });
     console.log('loaded!!')
 });
 

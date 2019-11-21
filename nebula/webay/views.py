@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from webay.forms import UserForm, UserProfileForm, ProfileImageForm, ItemForm, ItemImageForm
 from webay.models import UserProfile, User, Item
 from django.contrib.auth.decorators import login_required
-import datetime
+from datetime import datetime
 
 # Create your views here.
 
@@ -75,15 +75,16 @@ def item(request):
         user = User.objects.get(id=request.user.id)
 
         item_form = ItemForm(data=request.POST)
+        ##item_form.data['end_datetime'] = datetime.strptime(request.POST['end_datetime'], '%Y-%m-%dT%H:%M')
         item_pic = ItemImageForm(data=request.POST)
-        start_datetime = datetime.datetime.now().strftime('%d/%m/%Y %H:%M:%S')
 
-        print(datetime.datetime.now().strftime("%YYYY/%MM/%DD %HH:%MM"))
+
         print("hello" + request.POST['end_datetime'])
 
         if item_form.is_valid():
             print("entered")
             item = item_form.save()
+            item.start_datetime = datetime.datetime.now().strftime('%d/%m/%Y %H:%M:%S')
             item.user = user
             item.save()
         else:

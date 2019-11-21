@@ -7,6 +7,7 @@
         <form enctype="multipart/form-data" method="POST">
             {% csrf_token %}
             {{ itemForm.as_p }}
+            {{ itemForm.end_datetime }}
             {{ ItemImageForm.as_p}}
             <input type="submit" value="submit">
         </form>

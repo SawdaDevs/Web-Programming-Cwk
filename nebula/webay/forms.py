@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from webay.models import UserProfile, Item
+from .widgets import DateTimePickerInput
 
 
 class UserForm(forms.ModelForm):
@@ -43,7 +44,7 @@ class ProfileImageForm(forms.ModelForm):
 
 
 class ItemForm(forms.ModelForm):
-    end_datetime = forms.DateField(label='End Date/Time:')
+    end_datetime = forms.DateTimeField(label='End Date/Time:', input_formats='%Y-%m-%dT%H:%M')
 
     class Meta:
         model = Item
@@ -56,3 +57,9 @@ class ItemImageForm(forms.ModelForm):
     class Meta:
         model = Item
         fields = ['item_pic']
+
+class DateForm(forms.Form):
+    date = forms.DateTimeField(
+        input_formats=['%d/%m/%Y %H:%M'],
+        widget=DateTimePickerInput()
+        )
