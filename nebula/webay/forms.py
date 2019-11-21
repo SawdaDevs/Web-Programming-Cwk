@@ -43,10 +43,11 @@ class ProfileImageForm(forms.ModelForm):
 
 
 class ItemForm(forms.ModelForm):
+    end_datetime = forms.DateField(label='End Date/Time:')
 
     class Meta:
         model = Item
-        fields = ('title', 'description', 'base_price', 'start_datetime', 'end_datetime', 'user', 'winner_notified')
+        fields = ('title', 'description', 'base_price', 'end_datetime')
 
 
 class ItemImageForm(forms.ModelForm):

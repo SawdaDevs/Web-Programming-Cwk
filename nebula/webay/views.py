@@ -3,9 +3,9 @@ from django.shortcuts import render, redirect
 from webay.forms import UserForm, UserProfileForm, ProfileImageForm, ItemForm, ItemImageForm
 from webay.models import UserProfile, User, Item
 from django.contrib.auth.decorators import login_required
+import datetime
 
 # Create your views here.
-
 
 def index(request):
     return render(request, 'webay/base.html')
@@ -50,7 +50,6 @@ def profile(request):
         address = request.POST['address']
 
 
-
         profile = UserProfile.objects.get(user=request.user)
         user = User.objects.get(id=request.user.id)
         user.first_name = first_name
@@ -73,28 +72,29 @@ def profile(request):
 @login_required
 def item(request):
     if request.method =='POST':
-        title = request.POST['title']
-        description = request.POST['description']
-        base_price = request.POST['base_price']
-        start_datetime = request.POST['start_datetime']
-        end_datetime = request.POST['end_datetime']
-
+        user = User.objects.get(id=request.user.id)
 
         item_form = ItemForm(data=request.POST)
         item_pic = ItemImageForm(data=request.POST)
+        start_datetime = datetime.datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+
+        print(datetime.datetime.now().strftime("%YYYY/%MM/%DD %HH:%MM"))
+        print("hello" + request.POST['end_datetime'])
 
         if item_form.is_valid():
+            print("entered")
             item = item_form.save()
+            item.user = user
             item.save()
         else:
+            print("bye" + request.POST['end_datetime'])
             print(item_form.errors)
     else:
         item_form = ItemForm()
-
     return render(request, 'webay/item.html',
             {
-            'itemForm': ItemForm,
-            'ItemImageForm': ItemImageForm,
+                'itemForm': ItemForm,
+                'ItemImageForm': ItemImageForm,
             })
 
 @login_required
