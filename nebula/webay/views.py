@@ -86,7 +86,8 @@ def add_item(request):
             if 'item_pic' in request.FILES:
                 item.item_pic = request.FILES['item_pic']
             item.save()
-            return redirect('webay:profile')
+            return redirect('webay:profile')  # Modify redirect so it goes to my items once you've finished that section
+
         else:
             print(item_form.errors, item_image_form.errors)
     else:
