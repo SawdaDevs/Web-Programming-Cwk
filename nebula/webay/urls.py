@@ -11,4 +11,5 @@ urlpatterns = [
     path('login/', auth_views.LoginView.as_view(template_name='webay/login.html'), name='login'),
     path('logout/', views.logout, name="logout"),
     path('uploadimage/', views.upload_image, name='uploadimage'),
+    path('additems/', views.add_item, name='additem'),
 ]
