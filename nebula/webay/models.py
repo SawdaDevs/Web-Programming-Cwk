@@ -14,6 +14,7 @@ class Item(models.Model):
     end_datetime = models.DateTimeField('%d/%m/%Y %H:%M:%S')
     user = models.ForeignKey(User, on_delete=models.PROTECT)
 
+
 class Bid(models.Model):
     amount = models.DecimalField(max_digits=5, decimal_places=2)
     bid_datetime = models.DateTimeField('%d/%m/%Y %H:%M:%S')

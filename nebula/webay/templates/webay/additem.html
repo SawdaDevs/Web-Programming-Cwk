@@ -1,4 +1,4 @@
-{% extends "webay/profile.html" %}
+{% extends "webay/base_profile.html" %}
 {% block content %}
 
 <div class="container">
@@ -7,8 +7,7 @@
         <form enctype="multipart/form-data" method="POST">
             {% csrf_token %}
             {{ itemForm.as_p }}
-            {{ itemForm.end_datetime }}
-            {{ ItemImageForm.as_p}}
+            {{ itemImageForm.as_p}}
             <input type="submit" value="submit">
         </form>
     </div>
