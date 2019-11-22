@@ -1,16 +1,17 @@
 from django.contrib.auth import logout as django_logout
-from django.shortcuts import render, redirect
-from webay.forms import UserForm, UserProfileForm, ProfileImageForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.shortcuts import render, redirect
+from django.views.generic import DeleteView
+from django.views.generic import DetailView
+from webay.forms import UserForm, UserProfileForm, ProfileImageForm
+from .models import Bid
+from .models import Item
 
-from django.views.generic import ListView, DetailView, DeleteView
-from django.views.generic import TemplateView
-
-from .models import Item, Bid
 
 def index(request):
     return render(request, 'webay/base.html')
+
 
 def auctions(request):
     context = {
@@ -18,11 +19,13 @@ def auctions(request):
     }
     return render(request, 'webay/auctions.html', context)
 
+
 def bids(request):
     context = {
         'bids': Bid.objects.filter()
     }
     return render(request, 'webay/bids.html', context)
+
 
 class ItemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Item
@@ -34,6 +37,7 @@ class ItemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
             return True
         return False
 
+
 class ItemDetailView(DetailView):
     model = Item
     template_name = 'webay/item_detail.html'
@@ -43,6 +47,7 @@ class ItemDetailView(DetailView):
         context = super(ItemDetailView, self).get_context_data(**kwargs)
         context['bids'] = Bid.objects.all()
         return context
+
 
 def register(request):
     registered = False
@@ -73,7 +78,7 @@ def register(request):
                    'registered': registered
                    })
 
-
+@login_required
 def profile(request):
     print(request.user.username)
     return render(request, 'webay/profile.html')
