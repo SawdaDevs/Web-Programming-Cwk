@@ -1,6 +1,7 @@
 from django.contrib.auth import logout as django_logout
 from django.shortcuts import render, redirect
-from webay.forms import UserForm, UserProfileForm, ProfileImageForm, LoginForm
+from django.http import HttpResponse, Http404
+from webay.forms import UserForm, UserProfileForm, ProfileImageForm
 from webay.models import UserProfile, User
 from django.contrib.auth.decorators import login_required
 
@@ -84,6 +85,15 @@ def upload_image(request):
     else:
         raise Http404('Image file not received')
 
+def search(request):
+    if request.method == 'POST':
+        search = request.POST['search']
+        print(search)
+        #items = items.objects.filter(name__contains=search)
+
+        return redirect('webay:index')
+    else:
+        raise Http404('search not found')
 
 
 @login_required
