@@ -23,29 +23,29 @@ function completeHandler(event) {
 
 
 //AJAX FOR SEARCH ITEMS
-$('#search').keyup(function()){
-	event.preventDefault();
-}
+// $('#search').keyup(function()){
+// 	event.preventDefault();
+// }
 
-$.ajax({
-	type: 'POST',
-	url: '/search/',
-	data:{'search' :$('#search').val(), 'csrfmiddlewaretoken' : $('input[name =csrfmiddlewaretoken]'.val()},
-	sucess: handleSuccess,
-	error: handleError
+// $.ajax({
+// 	type: 'POST',
+// 	url: '/search/',
+// 	data:{'search' :$('#search').val(), 'csrfmiddlewaretoken' : $('input[name =csrfmiddlewaretoken]'.val()},
+// 	sucess: handleSuccess,
+// 	error: handleError
 
 
-});
-	function handleSuccess(data){
-		$('#search-results').html(data)
-		$('#page').hide();
-		quickview();
+// });
+// 	function handleSuccess(data){
+// 		$('#search-results').html(data)
+// 		$('#page').hide();
+// 		quickview();
 
-	}
+// 	}
 
-	function handleError(ThrowError){
-		console.log(ThrowError);
-	}
+// 	function handleError(ThrowError){
+// 		console.log(ThrowError);
+// 	}
 
 
 
