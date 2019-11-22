@@ -1,13 +1,12 @@
 from django.contrib.auth import logout as django_logout
+from django.http import HttpResponse, JsonResponse, QueryDict
+from django.template import loader
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import render, redirect
-from django.views.generic import DeleteView
-from django.views.generic import DetailView
 from webay.forms import UserForm, UserProfileForm, ProfileImageForm
-from .models import Bid
-from .models import Item
-
+from django.views.decorators.csrf import csrf_exempt
+from .models import Bid, Item
 
 def index(request):
     return render(request, 'webay/base.html')
@@ -26,28 +25,33 @@ def bids(request):
     }
     return render(request, 'webay/bids.html', context)
 
-
-class ItemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
-    model = Item
-    success_url = '/'
-
-    def test_func(self):
-        item = self.get_object()
-        if self.request.user == item.user:
-            return True
-        return False
+def item_view(request,item_id):
+    auc_item = Item.objects.get(id=item_id)
+    if Bid.objects.filter(item = item_id).exists():
+        bids = Bid.objects.filter(item = item_id)
+        highest_amount = Bid.objects.filter(item = item_id).order_by('amount')[0].amount
+    else:
+        highest_amount = auc_item.base_price
+        bids = {}
 
 
-class ItemDetailView(DetailView):
-    model = Item
-    template_name = 'webay/item_detail.html'
-    query_pk_and_slug = True
+    context = {
+        'items': Item.objects.all(),
+        'bids' : bids,
+        'highest_bid': highest_amount,
+        'auction_item' : auc_item
+    } 
+    return render(request, 'webay/item_detail.html',context)   
 
-    def get_context_data(self, **kwargs):
-        context = super(ItemDetailView, self).get_context_data(**kwargs)
-        context['bids'] = Bid.objects.all()
-        return context
-
+def deleteItem(request):
+        id = int(QueryDict(request.body).get('id'))
+        item_del = Item.objects.get(id=id)
+        item_del.delete()
+        response = JsonResponse({
+            'result': 'success'
+        })
+        response.status_code = 200
+        return response
 
 def register(request):
     registered = False
