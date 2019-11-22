@@ -9,6 +9,9 @@ from webay.models import UserProfile
 
 # Create your views here.
 
+def not_logged_in(user):
+    return not user.is_authenticated
+
 
 def index(request):
     return render(request, 'webay/base.html')
@@ -120,7 +123,3 @@ def upload_image(request):
 def logout(request):
     django_logout(request)
     return redirect('/')
-
-
-def not_logged_in(user):
-    return not user.is_authenticated
