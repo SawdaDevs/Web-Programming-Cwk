@@ -1,17 +1,24 @@
 from django.contrib.auth import logout as django_logout
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, Http404
-from webay.forms import UserForm, UserProfileForm, ProfileImageForm
-from webay.models import UserProfile, User
-from django.contrib.auth.decorators import login_required
+from django.utils import timezone
+from webay.forms import UserForm, UserProfileForm, ProfileImageForm, ItemForm, ItemImageForm
+from webay.models import UserProfile
+
+
 
 # Create your views here.
+
+def not_logged_in(user):
+    return not user.is_authenticated
 
 
 def index(request):
     return render(request, 'webay/base.html')
 
 
+@user_passes_test(not_logged_in, login_url='/profile')
 def register(request):
     registered = False
     if request.method == 'POST':
@@ -41,16 +48,15 @@ def register(request):
                    'registered': registered
                    })
 
+
 @login_required
 def profile(request):
-    if request.method =='POST':
+    if request.method == 'POST':
         first_name = request.POST['first_name']
         last_name = request.POST['last_name']
         mobile = request.POST['mobile']
         email = request.POST['email']
         address = request.POST['address']
-
-
 
         profile = UserProfile.objects.get(user=request.user)
         user = User.objects.get(id=request.user.id)
@@ -68,7 +74,34 @@ def profile(request):
 
     else:
         profile = UserProfile.objects.get(user=request.user)
-    return render(request, 'webay/profile.html', {'profile': profile})
+    return render(request, 'webay/profile_form.html', {'profile': profile})
+
+
+@login_required
+def add_item(request):
+    user = User.objects.get(pk=request.user.pk)
+    if request.method == 'POST':
+        item_form = ItemForm(data=request.POST)
+        item_image_form = ItemImageForm(data=request.POST)
+        if item_form.is_valid():
+            item = item_form.save(commit=False)
+            item.user = user
+            item.start_datetime = timezone.now()
+            if 'item_pic' in request.FILES:
+                item.item_pic = request.FILES['item_pic']
+            item.save()
+            return redirect('webay:profile')  # Modify redirect so it goes to my items once you've finished that section
+
+        else:
+            print(item_form.errors, item_image_form.errors)
+    else:
+        item_form = ItemForm(initial={'user': user.pk})
+        item_image_form = ItemImageForm()
+    return render(request, 'webay/additem.html',
+                  {
+                      'itemForm': item_form,
+                      'itemImageForm': item_image_form,
+                  })
 
 
 @login_required
@@ -76,6 +109,7 @@ def upload_image(request):
     if 'img_file' in request.FILES:
         image_file = request.FILES['img_file']
         profile = UserProfile.objects.get(user=request.user)
+
         if profile:
             # if user doesn't have a profile yet
             # need to create a profile first
@@ -94,7 +128,6 @@ def search(request):
         return redirect('webay:index')
     else:
         raise Http404('search not found')
-
 
 @login_required
 def logout(request):

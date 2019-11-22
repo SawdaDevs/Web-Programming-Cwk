@@ -1,0 +1,15 @@
+{% extends "webay/base_profile.html" %}
+{% block content %}
+
+<div class="container">
+    <div class="jumbotron">
+        <h3>Fill out the form to add an item.</h3>
+        <form enctype="multipart/form-data" method="POST">
+            {% csrf_token %}
+            {{ itemForm.as_p }}
+            {{ itemImageForm.as_p}}
+            <input type="submit" value="submit">
+        </form>
+    </div>
+</div>
+{% endblock %}
