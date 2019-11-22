@@ -1,5 +1,5 @@
 from django.contrib import admin
-from webay.models import UserProfile, Bid, Item, Notification
+from webay.models import UserProfile, Bid, Item
 
 # Register your models here.
 
@@ -7,4 +7,3 @@ from webay.models import UserProfile, Bid, Item, Notification
 admin.site.register(UserProfile)
 admin.site.register(Bid)
 admin.site.register(Item)
-admin.site.register(Notification)
