@@ -1,0 +1,46 @@
+{% extends 'webay/base.html' %}
+  {% block body_block %}
+  <div class="row">
+    <div class="col">
+
+      <img class="rounded-circle article-img" src="{{ object.author.profile.image.url }}">
+            <a class="mr-2" href="#">{{ object.user }}</a>
+            <small class="text-muted">{{ object.start_datetime|date:"F d, Y" }}</small>
+            <h2 class="article-title">{{ object.title }}</h2>
+            <img src="{{ object.item_pic.url }}" height="300" width="400"">
+            <p class="article-content">{{ object.description }}</p>
+            <p>Time left: <b>{{ object.end_datetime|timeuntil:object.start_datetime }}</b></p>
+
+            {% if object.user == user %}
+              <div>
+                <a class="btn btn-secondary btn-sm mt-1 mb-1" href="#">Update Item Details</a>
+                <a class="btn btn-danger btn-sm mt-1 mb-1" href="{% url 'webay:item-delete' object.id %}">Delete Item</a>
+              </div>
+            {% else %}
+      <form>
+        <br>
+        Enter bid amount: <input type="text" name="bid" value="enter your max. bid">
+        <input type="submit" value="Submit bid">
+      </form>
+        {% endif %}
+
+<br><br>
+<table style="width:100%">
+  <tr>
+    <th>Bidder</th>
+    <th>Bid amount</th>
+    <th>Bid time</th>
+  </tr>
+  {% for bid in bids %}
+    {% if object.title == bid.item.title %}
+      <tr>
+        <td>{{ bid.user }}</td>
+        <td> £{{ bid.amount }} </td>
+        <td> {{ bid.bid_datetime}} </td>
+      </tr>
+    {% endif %}
+  {% endfor %}
+</table>
+
+      </div>
+  {% endblock %}
