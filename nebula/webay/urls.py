@@ -1,15 +1,15 @@
 from django.urls import path, include
 from . import views
 from django.contrib.auth import views as auth_views
-from .views import ItemDetailView, ItemDeleteView
+# will deleteItemView and DeleteView
 
 app_name='webay'
 
 urlpatterns = [
     path('index', views.index, name='index'),
     path('', views.auctions, name='auctions'),
-    path('item/<int:pk>/', ItemDetailView.as_view(), name='item-detail'),
-    path('item/<int:pk>/delete/', ItemDeleteView.as_view(), name='item-delete'),
+    path('item/<int:item_id>/', views.item_view, name='item-detail'),
+    path('', views.deleteItem, name='deleteItem'),
     path('auctions/', views.auctions, name='auctions'),
     path('register/', views.register, name='register'),
     path('profile/', views.profile, name='profile'),
