@@ -42,8 +42,8 @@ class ProfileImageForm(forms.ModelForm):
 
 
 class ItemForm(forms.ModelForm):
-    end_datetime = forms.DateTimeField(label='End Date/Time:', input_formats=['%d/%m/%Y %H:%M:%S'])
-    title = forms.CharField(label='Item Name:')
+    end_datetime = forms.DateTimeField(label='End Date/Time', input_formats=['%d/%m/%Y %H:%M:%S'])
+    title = forms.CharField(label='Item Name')
 
     class Meta:
         model = Item

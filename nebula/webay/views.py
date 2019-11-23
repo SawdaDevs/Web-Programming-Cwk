@@ -1,10 +1,11 @@
 from django.contrib.auth import logout as django_logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
+from django.http import HttpResponse, QueryDict, JsonResponse
 from django.shortcuts import render, redirect
 from django.utils import timezone
 from webay.forms import UserForm, UserProfileForm, ProfileImageForm, ItemForm, ItemImageForm
-from webay.models import UserProfile
+from webay.models import UserProfile, Notification
 
 
 # Create your views here.
@@ -69,11 +70,16 @@ def profile(request):
         profile.save()
 
         return redirect('webay:profile')
-
-
     else:
-        profile = UserProfile.objects.get(user=request.user)
-    return render(request, 'webay/profile_form.html', {'profile': profile})
+        user_form = UserForm()
+        profile_form = UserProfileForm()
+        image_form = ProfileImageForm()
+    return render(request, 'webay/profile_form.html',
+                  {
+                      'user_form': user_form,
+                      'profile_form': profile_form,
+                      'image_form': image_form,
+                  })
 
 
 @login_required
@@ -103,20 +109,74 @@ def add_item(request):
                   })
 
 
-@login_required
-def upload_image(request):
+def get_user_details(request):
+    if request.method == 'GET':
+        user = User.objects.get(pk=request.user.id)
+        profile = UserProfile.objects.get(user=user)
+        return JsonResponse({
+            'username': user.username,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'email': user.email,
+            'dob': profile.dob,
+            'address': profile.address,
+            'mobile': profile.mobile,
+        })
+
+
+def update_profile_pic(request):
     if 'img_file' in request.FILES:
         image_file = request.FILES['img_file']
         profile = UserProfile.objects.get(user=request.user)
-
-        if profile:
-            # if user doesn't have a profile yet
-            # need to create a profile first
-            profile.profile_pic = image_file
-            profile.save()
-        return HttpResponse(profile.profile_pic.url)
+        profile.profile_pic = image_file
+        profile.save()
+        return HttpResponse(status=204)
     else:
-        raise Http404('Image file not received')
+        return HttpResponse(status=403)
+
+
+def update_profile_details(request):
+    if request.method == 'PUT':
+        user = User.objects.get(id=request.user.id)
+        profile = UserProfile.objects.get(user=request.user)
+        data = QueryDict(request.body)
+        user.first_name = data['first_name']
+        user.last_name = data['last_name']
+        user.email = data['email']
+        profile.dob = data['dob']
+        profile.address = data['address']
+        profile.mobile = data['mobile']
+        user.save()
+        profile.save()
+        return HttpResponse(status=204)
+    else:
+        return HttpResponse(status=403)
+
+
+def get_notifications(request):
+    return JsonResponse(dict(notifications=list(
+        Notification.objects.filter(recipient_id=request.user.id).values('id', 'read_message', 'item_id'))))
+
+
+def get_notifications_message(request, id):
+    notification = Notification.objects.filter(id=id).get();
+    return HttpResponse(notification.message, content_type="text/html")
+
+
+def get_number_unread_notifs(request):
+    notification = Notification.objects.filter(recipient_id=request.user.id, read_message=0).count()
+    return HttpResponse(notification,)
+
+
+def mark_notification_as_read(request, id):
+    notification = Notification.objects.get(id=id)
+    print(notification)
+    notification.read_message = 1
+    notification.save()
+    return HttpResponse(status=200)
+
+def display_notifications(request):
+    return render(request, "webay/notifications.html")
 
 
 @login_required
