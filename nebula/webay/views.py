@@ -231,11 +231,12 @@ def search(request):
     if request.method == 'POST':
         search = request.POST['search']
         print(search)
-        # items = items.objects.filter(name__contains=search)
+        try: itemSearch = Item.objects.all().filter(title__contains=search)
+        except Item.DoesNotExist: raise Http404('Item does not exist')
 
-        return redirect('webay:index')
+        return render(request, 'webay/searchitems.html', {'itemSearch':itemSearch,})
     else:
-        raise Http404('search not found')
+        raise Http404('search not found') 
 
 
 @login_required

@@ -26,9 +26,9 @@
     <form class="mx-2 my-auto w-50" method="post" action="{% url 'webay:search' %}">
         {% csrf_token %}
         <div class="input-group">
-            <input type="text" name="search" class="form-control border border-right-0" placeholder="Search...">
+            <input id="search" type="text" name="search" class="form-control border border-right-0" placeholder="Search...">
             <span class="input-group-append">
-                <button class="btn btn-outline-info my-sm-0" type="submit">Search</button>
+                <button id="searchButton" class="btn btn-outline-info my-sm-0" type="submit">Search</button>
               </span>
         </div>
     </form>
