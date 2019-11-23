@@ -13,8 +13,8 @@ class Command(BaseCommand):
         winners = self.get_all_not_notified_winners()
         for winner in winners:
             fname, lname, title, item_id, user_id, amount = winner
-            message = self.NOTIFY_MESSAGE.format(fname, lname, title, amount)
-            self.create_notification_db(user_id, message)
+            message = NOTIFY_MESSAGE.format(fname, lname, title, amount)
+            self.create_notification_db(user_id, item_id, message)
 
     def get_all_not_notified_winners(self):
         with connection.cursor() as cursor:
@@ -28,10 +28,10 @@ class Command(BaseCommand):
             row = cursor.fetchall()
         return row
 
-    def create_notification(self, user_id, item_id, message):
+    def create_notification_db(self, user_id, item_id, message):
         with connection.cursor() as cursor:
             sql = 'INSERT INTO webay_notification(message, email_sent, read_message, recipient_id, item_id) ' \
-                  'VALUES (?, ?, ?, ?, ?)'
+                  'VALUES (%s, %s, %s, %s, %s)'
             params = (message, 0, 0, user_id, item_id)
             cursor.execute(sql, params)
             connection.commit()
