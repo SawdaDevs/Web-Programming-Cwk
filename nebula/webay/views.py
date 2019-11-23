@@ -6,43 +6,47 @@ from django.shortcuts import render, redirect
 from django.utils import timezone
 from webay.forms import UserForm, UserProfileForm, ProfileImageForm, ItemForm, ItemImageForm
 from webay.models import UserProfile, Notification
-
+from django.views.decorators.csrf import csrf_exempt
 from .models import Bid, Item
-
+import datetime
 
 def index(request):
     return render(request, 'webay/base.html')
 
-
 def not_logged_in(user):
     return not user.is_authenticated
 
+def closed_auctions(request):
+    context ={
+        'items':Item.objects.filter(end_datetime__lte=datetime.datetime.now()),
+    }
+    return render(request, 'webay/closed_auctions.html', context)
 
 def auctions(request):
     context = {
-        'items': Item.objects.all()
+        'items':Item.objects.filter(end_datetime__gte=datetime.datetime.now())
     }
-    return render(request, 'webay/auctions.html', context)
+    return render(request, 'webay/auctions.html', context) 
 
 def item_view(request, item_id):
     auc_item = Item.objects.get(id=item_id)
     if Bid.objects.filter(item=item_id).exists():
         bids = Bid.objects.filter(item=item_id)
-        highest_amount = Bid.objects.filter(item=item_id).order_by('amount')[0].amount
+        highest_amount = Bid.objects.filter(item=item_id).order_by('-amount')[0].amount
     else:
         highest_amount = auc_item.base_price
         bids = {}
-
     context = {
-        'items': Item.objects.all(),
         'bids': bids,
         'highest_bid': highest_amount,
-        'auction_item': auc_item
+        'auction_item': auc_item,
+        'now_DateTime' :  datetime.datetime.now()
     }
     return render(request, 'webay/item_detail.html', context)
 
-
-def deleteItem(request):
+@csrf_exempt
+@login_required
+def deleteItem(request, item_id):
     id = int(QueryDict(request.body).get('id'))
     item_del = Item.objects.get(id=id)
     item_del.delete()
@@ -50,8 +54,41 @@ def deleteItem(request):
         'result': 'success'
     })
     response.status_code = 200
-    return response
+    render(request, 'webay/auctions.html')
+    # not sure about the return but would make sense that the website goes to all open auctions
 
+@csrf_exempt
+@login_required
+def bidItem(request, item_id):
+    amount = int(QueryDict(request.body).get('amount'))
+    auc_item = Item.objects.get(id=item_id)
+    bid_time = datetime.datetime.now()
+    bids = Bid.objects.filter(item=item_id)
+    bid_user = request.user
+    if Bid.objects.filter(item=item_id).filter(user=bid_user).exists():
+        highest_bid_user = Bid.objects.filter(item=item_id).filter(user=bid_user).order_by('-amount')[0]
+        highest_bid_user.amount = amount
+        highest_bid_user.bid_datetime = bid_time
+        highest_bid_user.save()
+        context = {
+            'bids': bids,
+            'highest_bid': amount,
+            'auction_item': auc_item,
+            'now_DateTime' :  datetime.datetime.now()
+        }
+        return render(request, 'webay/item_detail.html', context)
+        # not sure about the return ?
+    else:
+        new_bid = Bid(amount = amount ,bid_datetime = bid_time, item = auc_item,user=bid_user )
+        new_bid.save()
+        context = {
+            'bids': bids,
+            'highest_bid': amount,
+            'auction_item': auc_item,
+            'now_DateTime' :  datetime.datetime.now()
+        }
+        return render(request, 'webay/item_detail.html', context)
+        # not sure about the return?
 
 @user_passes_test(not_logged_in, login_url='/profile')
 def register(request):
