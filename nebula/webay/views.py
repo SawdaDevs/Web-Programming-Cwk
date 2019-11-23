@@ -1,7 +1,7 @@
 from django.contrib.auth import logout as django_logout
 from django.contrib.auth.decorators import user_passes_test, login_required
 from django.contrib.auth.models import User
-from django.http import HttpResponse, JsonResponse, QueryDict
+from django.http import HttpResponse, JsonResponse, QueryDict, Http404
 from django.shortcuts import render, redirect
 from django.utils import timezone
 from webay.forms import UserForm, UserProfileForm, ProfileImageForm, ItemForm, ItemImageForm
@@ -23,14 +23,6 @@ def auctions(request):
         'items': Item.objects.all()
     }
     return render(request, 'webay/auctions.html', context)
-
-
-def bids(request):
-    context = {
-        'bids': Bid.objects.filter()
-    }
-    return render(request, 'webay/bids.html', context)
-
 
 def item_view(request, item_id):
     auc_item = Item.objects.get(id=item_id)
@@ -196,6 +188,17 @@ def mark_notification_as_read(request, id):
 
 def display_notifications(request):
     return render(request, "webay/notifications.html")
+
+
+def search(request):
+    if request.method == 'POST':
+        search = request.POST['search']
+        print(search)
+        # items = items.objects.filter(name__contains=search)
+
+        return redirect('webay:index')
+    else:
+        raise Http404('search not found')
 
 
 @login_required

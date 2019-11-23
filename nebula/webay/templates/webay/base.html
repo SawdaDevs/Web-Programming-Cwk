@@ -23,9 +23,10 @@
 <body>
 <nav class="navbar navbar-expand-xl navbar-dark bg-dark">
     <a href="{% url 'webay:index' %}" class="navbar-brand">Webay</a>
-    <form class="mx-2 my-auto w-50">
+    <form class="mx-2 my-auto w-50" method="post" action="{% url 'webay:search' %}">
+        {% csrf_token %}
         <div class="input-group">
-            <input type="text" class="form-control border border-right-0" placeholder="Search...">
+            <input type="text" name="search" class="form-control border border-right-0" placeholder="Search...">
             <span class="input-group-append">
                 <button class="btn btn-outline-info my-sm-0" type="submit">Search</button>
               </span>
