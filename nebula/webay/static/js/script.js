@@ -88,27 +88,27 @@ $(function () {
 });
 
 
-//AJAX FOR SEARCH ITEMS
-// $('#search').keyup(function()){
-// 	event.preventDefault();
-// }
+$(document).ready(function(){
+    $("#searchButton").click(function() {
 
-// $.ajax({
-// 	type: 'POST',
-// 	url: '/search/',
-// 	data:{'search' :$('#search').val(), 'csrfmiddlewaretoken' : $('input[name =csrfmiddlewaretoken]'.val()},
-// 	sucess: handleSuccess,
-// 	error: handleError
+    event.preventDefault();
+
+$.ajax({
+    type: 'POST',
+    url: '/search/',
+    data:{'search' :$('#search').val(), 'csrfmiddlewaretoken' : $('input[name=csrfmiddlewaretoken]').val()},
+    success: handleSuccess,
+    error: handleError
 
 
-// });
-// 	function handleSuccess(data){
-// 		$('#search-results').html(data)
-// 		$('#page').hide();
-// 		quickview();
+});
+    function handleSuccess(data){
+        console.log(data)
+        $('#search-results').html(data);
+    }
 
-// 	}
-
-// 	function handleError(ThrowError){
-// 		console.log(ThrowError);
-// 	}
+    function handleError(ThrowError){
+        console.log(ThrowError);
+    }
+  });  
+});
