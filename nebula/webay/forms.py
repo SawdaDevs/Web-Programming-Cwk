@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
-from webay.models import UserProfile
+from webay.models import UserProfile, Item
 
 
 class UserForm(forms.ModelForm):
@@ -39,3 +39,20 @@ class ProfileImageForm(forms.ModelForm):
     class Meta:
         model = UserProfile
         fields = ['profile_pic']
+
+
+class ItemForm(forms.ModelForm):
+    end_datetime = forms.DateTimeField(label='End Date/Time', input_formats=['%d/%m/%Y %H:%M:%S'])
+    title = forms.CharField(label='Item Name')
+
+    class Meta:
+        model = Item
+        fields = ('title', 'description', 'base_price', 'end_datetime')
+
+
+class ItemImageForm(forms.ModelForm):
+    item_pic = forms.ImageField(label='Upload a item picture')
+
+    class Meta:
+        model = Item
+        fields = ['item_pic']

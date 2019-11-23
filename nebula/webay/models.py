@@ -13,10 +13,10 @@ class Item(models.Model):
     start_datetime = models.DateTimeField('%d/%m/%Y %H:%M:%S')
     end_datetime = models.DateTimeField('%d/%m/%Y %H:%M:%S')
     user = models.ForeignKey(User, on_delete=models.PROTECT)
-    winner_notified = models.BooleanField()
 
     def __str__(self):
         return self.title
+
 
 class Bid(models.Model):
     amount = models.DecimalField(max_digits=5, decimal_places=2)
@@ -26,6 +26,7 @@ class Bid(models.Model):
 
     def __str__(self):
         return self.item.title
+
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
@@ -38,8 +39,10 @@ class UserProfile(models.Model):
     def __str__(self):
         return self.user.username
 
-class Message(models.Model):
-    recipient = models.OneToOneField(User, on_delete=models.CASCADE, related_name='message')
+
+class Notification(models.Model):
+    recipient = models.ForeignKey(User, on_delete=models.PROTECT, related_name='notification')
+    item = models.ForeignKey(Item, on_delete=models.PROTECT)
     message = models.TextField()
     email_sent = models.BooleanField()
     read_message = models.BooleanField()
