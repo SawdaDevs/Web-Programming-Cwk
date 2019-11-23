@@ -1,0 +1,16 @@
+{% extends "webay/base.html" %}
+{% block body_block %}
+<p>  {{ request.build_absolute_uri }} </p>
+<p>  </p>
+  {% for bid in bids %}
+      {% for item in items %}
+        {% if item.title == bid.item.title %}
+          <p>Bid amount for {{ item.title }} is {{ bid.amount }}</p>
+        {% endif %}
+      {% endfor %}
+  {% endfor %}
+
+
+
+
+{% endblock %}

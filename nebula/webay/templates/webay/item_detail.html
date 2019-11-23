@@ -1,0 +1,43 @@
+{% extends 'webay/base.html' %}
+  {% block body_block %}
+  <div class="row">
+    <div class="col">
+
+      <img class="rounded-circle article-img" src="{{ auction_item.author.profile.image.url }}">
+        <div class="media-body">
+          <div class="article-metadata">
+            <a class="mr-2" href="#">{{ auction_item.user }}</a>
+            <small class="text-muted">{{ auction_item.start_datetime|date:"F d, Y" }}</small>
+            <h2 class="article-title">{{ auction_item.title }}</h2>
+          <img src="{{ auction_item.item_pic.url }}" height="300" width="100%">
+          <p class="article-content">{{ auction_item.description }}</p>
+            {% if auction_item.user == user %}
+              <div>
+                <button id ="{{object.id}}" class="deleteButton">Delete This Item </button>
+              </div>
+            {% else %}
+      <form>
+        <br>
+        Bid Amount: <input type="number" name="bidAmount" min="{{ highest_bid }}" >
+        <button id="addBid">Bid</button>
+      </form>
+        {% endif %}
+
+<br><br>
+<table style="width:100%">
+  <tr>
+    <th>Bidder</th>
+    <th>Bid amount</th>
+    <th>Bid time</th>
+  </tr>
+  {% for bid in bids %}
+      <tr>
+        <td>{{ bid.user }}</td>
+        <td> £{{ bid.amount }} </td>
+        <td> {{ bid.bid_datetime}} </td>
+      </tr>
+  {% endfor %}
+</table>
+
+      </div>
+  {% endblock %}

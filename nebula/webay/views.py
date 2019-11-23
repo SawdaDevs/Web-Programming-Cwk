@@ -1,21 +1,64 @@
 from django.contrib.auth import logout as django_logout
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import user_passes_test, login_required
 from django.contrib.auth.models import User
-from django.http import HttpResponse, QueryDict, JsonResponse
+from django.http import HttpResponse, JsonResponse, QueryDict
 from django.shortcuts import render, redirect
 from django.utils import timezone
 from webay.forms import UserForm, UserProfileForm, ProfileImageForm, ItemForm, ItemImageForm
 from webay.models import UserProfile, Notification
 
+from .models import Bid, Item
 
-# Create your views here.
+
+def index(request):
+    return render(request, 'webay/base.html')
+
 
 def not_logged_in(user):
     return not user.is_authenticated
 
 
-def index(request):
-    return render(request, 'webay/base.html')
+def auctions(request):
+    context = {
+        'items': Item.objects.all()
+    }
+    return render(request, 'webay/auctions.html', context)
+
+
+def bids(request):
+    context = {
+        'bids': Bid.objects.filter()
+    }
+    return render(request, 'webay/bids.html', context)
+
+
+def item_view(request, item_id):
+    auc_item = Item.objects.get(id=item_id)
+    if Bid.objects.filter(item=item_id).exists():
+        bids = Bid.objects.filter(item=item_id)
+        highest_amount = Bid.objects.filter(item=item_id).order_by('amount')[0].amount
+    else:
+        highest_amount = auc_item.base_price
+        bids = {}
+
+    context = {
+        'items': Item.objects.all(),
+        'bids': bids,
+        'highest_bid': highest_amount,
+        'auction_item': auc_item
+    }
+    return render(request, 'webay/item_detail.html', context)
+
+
+def deleteItem(request):
+    id = int(QueryDict(request.body).get('id'))
+    item_del = Item.objects.get(id=id)
+    item_del.delete()
+    response = JsonResponse({
+        'result': 'success'
+    })
+    response.status_code = 200
+    return response
 
 
 @user_passes_test(not_logged_in, login_url='/profile')
@@ -51,37 +94,12 @@ def register(request):
 
 @login_required
 def profile(request):
-    if request.method == 'POST':
-        first_name = request.POST['first_name']
-        last_name = request.POST['last_name']
-        mobile = request.POST['mobile']
-        email = request.POST['email']
-        address = request.POST['address']
-
-        profile = UserProfile.objects.get(user=request.user)
-        user = User.objects.get(id=request.user.id)
-        user.first_name = first_name
-        user.last_name = last_name
-        user.email = email
-        profile.mobile = mobile
-        profile.address = address
-
-        user.save()
-        profile.save()
-
-        return redirect('webay:profile')
-    else:
-        user_form = UserForm()
-        profile_form = UserProfileForm()
-        image_form = ProfileImageForm()
     return render(request, 'webay/profile_form.html',
                   {
                       'user_form': user_form,
                       'profile_form': profile_form,
                       'image_form': image_form,
                   })
-
-
 @login_required
 def add_item(request):
     user = User.objects.get(pk=request.user.pk)
@@ -165,7 +183,7 @@ def get_notifications_message(request, id):
 
 def get_number_unread_notifs(request):
     notification = Notification.objects.filter(recipient_id=request.user.id, read_message=0).count()
-    return HttpResponse(notification,)
+    return HttpResponse(notification)
 
 
 def mark_notification_as_read(request, id):
@@ -174,6 +192,7 @@ def mark_notification_as_read(request, id):
     notification.read_message = 1
     notification.save()
     return HttpResponse(status=200)
+
 
 def display_notifications(request):
     return render(request, "webay/notifications.html")

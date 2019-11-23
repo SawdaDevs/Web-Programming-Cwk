@@ -4,8 +4,6 @@
     <meta charset="utf-8">
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/static/css/custom.css">
     <script defer src="/static/js/libs/jquery-3.4.1.min.js" charset="utf-8"></script>
     <script defer src="/static/js/libs/bootstrap.bundle.min.js" charset="utf-8"></script>
     <script type="module" src="/static/js/libs/js.cookie.min.js"></script>
@@ -17,6 +15,9 @@
             src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js"
             integrity="sha256-FEqEelWI3WouFOo2VWP/uJfs1y8KJ++FLh2Lbqc8SJk=" crossorigin="anonymous"></script>
     <script defer src="/static/js/script.js" charset="utf-8"></script>
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/custom.css">
+
     <title>Webay</title>
 </head>
 <body>
@@ -39,7 +40,7 @@
                 <a class="nav-link" href="{% url 'webay:index' %}">Home</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#">Open Auctions</a>
+                <a class="nav-link" href="{% url 'webay:auctions' %}">Open Auctions</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="#">Closed Auctions</a>
@@ -61,12 +62,10 @@
             </li>
             {% else %}
             <li class="nav-item">
-                <a id="login-btn" class="nav-link btn btn-info btn-sm text-white mr-2" role="button"
-                   href="{% url 'webay:login' %}">Login</a>
+                <a id="login-btn" class="nav-link btn btn-info btn-sm text-white mr-2" role="button" href="{% url 'webay:login' %}">Login</a>
             </li>
             <li class="nav-item">
-                <a id="register-btn" class="nav-link btn btn-info btn-sm text-white" role="button"
-                   href="{% url 'webay:register' %}">Register</a>
+                <a id="register-btn" class="nav-link btn btn-info btn-sm text-white" role="button" href="{% url 'webay:register' %}">Register</a>
             </li>
             {% endif %}
         </ul>
