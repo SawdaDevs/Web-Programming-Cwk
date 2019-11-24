@@ -1,9 +1,5 @@
-{% extends 'webay/base.html' %}
-{% block body_block %}
-<div class="container">
-    <h1> Auctions </h1>
-    <div id="search-results" class="row">
-    {% for item in items %}
+{% if itemSearch.count > 0 %}
+{% for item in itemSearch %}
       <div class="col">
         <img class="rounded-circle article-img" src="{{ item.user.profile_pic.url }}">
         <div class="media-body">
@@ -16,5 +12,6 @@
         </div>
       </div>
     {% endfor %}
-</div></div>
-{% endblock %}
+ {% else %}
+ 	<li> No results </li>
+ {% endif %}
