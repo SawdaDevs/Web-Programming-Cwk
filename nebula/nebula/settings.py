@@ -123,3 +123,10 @@ LOGIN_REDIRECT_URL = '/profile'
 MEDIA_DIR = os.path.join(BASE_DIR)
 MEDIA_ROOT = MEDIA_DIR
 MEDIA_URL = '/webay/media/'
+
+# Email settings
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = os.environ.get('GMAIL_ADDRESS')
+EMAIL_HOST_PASSWORD = os.environ.get('GMAIL_PW')
+EMAIL_USE_TLS = True
