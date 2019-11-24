@@ -33,22 +33,53 @@ $(document).ready(() => {
     })
 
     $(".deleteButton").on("click", function(){
-        console.log(this.id);
-        // const oId = $(this).attr('id');
-        // console.log('ither one' +  oId);
-
-
+        // console.log($(this).attr('id'));
         const id = this.id;
+        console.log("this is item id:" +id)
+        deleteItemUrl = `/deleteItem/${id}`
+        const dataObj = {
+            'id' : id 
+        }
         $.ajax({
-            url: '/deleteItem/' + id, //@Sawda try it with this url
+            url: deleteItemUrl,
             method:"DELETE",
-            data: { 'id' : id },
+            data: dataObj,
             success: ()=>{
                 //redirect back to all page?
                 alert("this delete worked")
             },
             error: ()=>{
                 alert("this delete for item did not work");
+                //stay on page
+            }
+
+        })
+    });
+
+    $(".addBid").on("click", function(){
+        const id = this.id;
+        // console.log("this is item id:" +id);
+        const bidItemUrl = `/bidItem/${id}`;
+        const bidAmount = $("#bidAmount").val();
+        const limit = $("#highestTag").val()
+        const dataObj = {
+            'id' : id,
+            'amount' : bidAmount,
+            'bidder' : bidUser,
+
+        }
+        console.log(dataObj);
+        $.ajax({
+            url: bidItemUrl,
+            method:"PUT",
+            data: dataObj,
+            success: ()=>{
+                alert("this bid worked. Yay!");
+
+
+            },
+            error: ()=>{
+                alert("The bid for item did not work. Contact your admin :D");
                 //stay on page
             }
 
@@ -88,27 +119,27 @@ $(function () {
 });
 
 
-//AJAX FOR SEARCH ITEMS
-// $('#search').keyup(function()){
-// 	event.preventDefault();
-// }
+$(document).ready(function(){
+    $("#searchButton").click(function() {
 
-// $.ajax({
-// 	type: 'POST',
-// 	url: '/search/',
-// 	data:{'search' :$('#search').val(), 'csrfmiddlewaretoken' : $('input[name =csrfmiddlewaretoken]'.val()},
-// 	sucess: handleSuccess,
-// 	error: handleError
+    event.preventDefault();
+
+$.ajax({
+    type: 'POST',
+    url: '/search/',
+    data:{'search' :$('#search').val(), 'csrfmiddlewaretoken' : $('input[name=csrfmiddlewaretoken]').val()},
+    success: handleSuccess,
+    error: handleError
 
 
-// });
-// 	function handleSuccess(data){
-// 		$('#search-results').html(data)
-// 		$('#page').hide();
-// 		quickview();
+});
+    function handleSuccess(data){
+        console.log(data)
+        $('#search-results').html(data);
+    }
 
-// 	}
-
-// 	function handleError(ThrowError){
-// 		console.log(ThrowError);
-// 	}
+    function handleError(ThrowError){
+        console.log(ThrowError);
+    }
+  });  
+});
