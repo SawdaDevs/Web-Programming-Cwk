@@ -1,43 +1,85 @@
 {% extends 'webay/base.html' %}
   {% block body_block %}
   <div class="row">
-    <div class="col">
+  <div class="col">
+  <img class="rounded-circle article-img" src="{{ auction_item.author.profile.image.url }}">
+  <div class="media-body">
+  <div class="article-metadata">
+  <a class="mr-2" href="#">{{ auction_item.user }}</a>
+  <small class="text-muted">{{ auction_item.start_datetime|date:"F d, Y" }}</small>
+  <h2 class="article-title">{{ auction_item.title }}</h2>
+  <img src="{{ auction_item.item_pic.url }}" height="300" width="100%">
+  <p class="article-content">{{ auction_item.description }}</p>
+  {% if now_DateTime >= auction_item.end_datetime  %} 
 
-      <img class="rounded-circle article-img" src="{{ auction_item.author.profile.image.url }}">
-        <div class="media-body">
-          <div class="article-metadata">
-            <a class="mr-2" href="#">{{ auction_item.user }}</a>
-            <small class="text-muted">{{ auction_item.start_datetime|date:"F d, Y" }}</small>
-            <h2 class="article-title">{{ auction_item.title }}</h2>
-          <img src="{{ auction_item.item_pic.url }}" height="300" width="100%">
-          <p class="article-content">{{ auction_item.description }}</p>
-            {% if auction_item.user == user %}
-              <div>
-                <button id ="{{object.id}}" class="deleteButton">Delete This Item </button>
-              </div>
-            {% else %}
-      <form>
+      <p>The the auction for this item has ended. Please check other items to bid on</p>
+  
+  {% else %}
+
+      {% if auction_item.user == user %}
+
+        <div>
+          <button id ="{{auction_item.id}}" class="deleteButton">Delete This Item </button>
+        </div>
+
+      {% elif user.is_anonymous%}
+
+        <p> You need to log in to be able to bid!</p>
+
+      {% else %}
+
+        <form id="bidForm">
         <br>
-        Bid Amount: <input type="number" name="bidAmount" min="{{ highest_bid }}" >
-        <button id="addBid">Bid</button>
-      </form>
-        {% endif %}
+        <p>{{user}}, enter your bids!</p>
+        Bid Amount : <input type="number" id="bidAmount" min="{{ highest_bid }}" >
+        <button id="{{auction_item.id}}" class="addBid">Bid</button>
+        <label id="highestTag" value="{{ highest_bid }}"hidden></label>
+        </form>
+
+      {% endif %}
+
+  {% endif %}
 
 <br><br>
-<table style="width:100%">
-  <tr>
-    <th>Bidder</th>
-    <th>Bid amount</th>
-    <th>Bid time</th>
-  </tr>
-  {% for bid in bids %}
-      <tr>
-        <td>{{ bid.user }}</td>
-        <td> £{{ bid.amount }} </td>
-        <td> {{ bid.bid_datetime}} </td>
-      </tr>
-  {% endfor %}
-</table>
+  {% if now_DateTime > auction_item.end_datetime  %}
+      {% if bids %}
+      <table style="width:100%">
+          <tr>
+              <th>Bidder</th>
+              <th>Bid amount</th>
+              <th>Bid time</th>
+          </tr>
+            {% for bid in bids %}
+              <tr>
+                <td>{{ bid.user }}</td>
+                <td> £{{ bid.amount }} </td>
+                <td> {{ bid.bid_datetime}} </td>
+              </tr>
+            </table>
+            {% endfor %}
+      {% else %}
+        <p>There were no items for this bid</p>      
+      {% endif %}
 
+  {% else %}
+      {% if bids %}
+        <table style="width:100%">
+        <tr>
+            <th>Bidder</th>
+            <th>Bid amount</th>
+            <th>Bid time</th>
+        </tr>
+          {% for bid in bids %}
+            <tr>
+              <td>{{ bid.user }}</td>
+              <td> £{{ bid.amount }} </td>
+              <td> {{ bid.bid_datetime}} </td>
+            </tr>
+          </table>
+          {% endfor %}
+        {% else %}
+        <p>There are currently no bids for this item</p>
+        {% endif %}
+  {% endif %}        
       </div>
-  {% endblock %}
+{% endblock %}
