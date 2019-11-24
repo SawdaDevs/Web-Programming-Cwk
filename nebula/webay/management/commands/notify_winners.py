@@ -3,7 +3,8 @@ from django.core.management.base import BaseCommand
 from django.db import connection
 
 NOTIFY_MESSAGE = 'Dear {} {},\\nCongrats! You have won the {}.\\nJust to remind you, you bidded: £{}.' \
-                     '\\nKind regards,\\nWebay'
+                 '\\nKind regards,\\nWebay'
+
 
 class Command(BaseCommand):
     help = 'Finds winners of closed auctions who have not been notified, ' \

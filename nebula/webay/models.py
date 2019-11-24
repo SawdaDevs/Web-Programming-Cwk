@@ -1,6 +1,7 @@
-from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
+from django.db import models
+
 
 # Create your models here.
 
@@ -9,7 +10,7 @@ class Item(models.Model):
     title = models.CharField(max_length=255)
     description = models.CharField(max_length=500)
     item_pic = models.ImageField(upload_to='webay/media/item_pics')
-    base_price = models.DecimalField(max_digits=5, decimal_places=2)
+    base_price = models.DecimalField(max_digits=10, decimal_places=2)
     start_datetime = models.DateTimeField('%d/%m/%Y %H:%M:%S')
     end_datetime = models.DateTimeField('%d/%m/%Y %H:%M:%S')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -19,10 +20,10 @@ class Item(models.Model):
 
 
 class Bid(models.Model):
-    amount = models.DecimalField(max_digits=5, decimal_places=2)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
     bid_datetime = models.DateTimeField('%d/%m/%Y %H:%M:%S')
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, to_field="username")
 
     def __str__(self):
         return self.item.title

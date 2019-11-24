@@ -1,5 +1,13 @@
 $(document).ready(() => {
-    getNotifications();
+    if (window.location.pathname === '/notifications/') {
+        getNotifications();
+        header = 'Messages';
+    } else if (window.location.pathname === '/myItems/') {
+        header = 'My Items';
+        getMyItems();
+    }
+
+    $('#profileTableHeader').text(header)
 });
 
 function getNotifications() {
@@ -9,9 +17,26 @@ function getNotifications() {
         contentType: "application/json",
         success: data => {
             for (const notification of data.notifications) {
-                console.log(notification);
-                $('#notiftable').append('<tr id="notifRow' + notification.id + '" role="button" class="' + (notification.read_message ? '' : 'font-weight-bold') +
+                $('#profileTable').append('<tr id="notifRow' + notification.id + '" role="button" class="' + (notification.read_message ? '' : 'font-weight-bold') +
                     '" data-toggle="modal" data-target="#notificationModal" data-id="' + notification.id + '"><td>You won item ' + notification.item_id + '!</td></tr>');
+            }
+
+        },
+        error: error => {
+            alert("Could not fetch details, please try again later.");
+        }
+    });
+}
+
+
+function getMyItems() {
+    $.ajax({
+        type: "GET",
+        url: "/getMyItems/",
+        contentType: "application/json",
+        success: data => {
+            for (const item of data.items) {
+                $('#profileTable').append('<tr><td><a href="/item/' + item.id + '">' + item.title + '</a></td></tr>');
             }
 
         },

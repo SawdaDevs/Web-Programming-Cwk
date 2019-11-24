@@ -16,10 +16,10 @@ $(document).ready(() => {
 
 function getUserDetails() {
     $.ajax({
-            type: "GET",
-            url: "/getUserDetails/",
-            contentType: "application/json",
-            success: data => {
+        type: "GET",
+        url: "/getUserDetails/",
+        contentType: "application/json",
+        success: data => {
             $('#updateProfileDetails input[name="username"]').val(data.username);
             $('#updateProfileDetails input[name="first_name"]').val(data.first_name);
             $('#updateProfileDetails input[name="last_name"]').val(data.last_name);
@@ -27,10 +27,10 @@ function getUserDetails() {
             $('#updateProfileDetails input[name="dob"]').val(data.dob);
             $('#updateProfileDetails input[name="address"]').val(data.address);
             $('#updateProfileDetails input[name="mobile"]').val(data.mobile);
-            },
-            error: error => {
-                alert("Could not fetch details, please try again later.");
-            }
+        },
+        error: error => {
+            alert("Could not fetch details, please try again later.");
+        }
     });
 }
 

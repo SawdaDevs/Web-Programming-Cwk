@@ -1,3 +1,4 @@
+import datetime
 from django.contrib.auth import logout as django_logout
 from django.contrib.auth.decorators import user_passes_test, login_required
 from django.contrib.auth.models import User
@@ -5,90 +6,71 @@ from django.http import HttpResponse, JsonResponse, QueryDict, Http404
 from django.shortcuts import render, redirect
 from django.utils import timezone
 from webay.forms import UserForm, UserProfileForm, ProfileImageForm, ItemForm, ItemImageForm
-from webay.models import UserProfile, Notification
-from django.views.decorators.csrf import csrf_exempt
-from .models import Bid, Item
-import datetime
+from webay.models import UserProfile, Notification, Bid
+
+from .models import Item
+
 
 def index(request):
-    return render(request, 'webay/base.html')
+    context = {
+        'items': Item.objects.filter(end_datetime__gte=datetime.datetime.now())[:5]
+    }
+    return render(request, 'webay/index.html', context)
+
 
 def not_logged_in(user):
     return not user.is_authenticated
 
+
 def closed_auctions(request):
-    context ={
-        'items':Item.objects.filter(end_datetime__lte=datetime.datetime.now()),
+    context = {
+        'items': Item.objects.filter(end_datetime__lte=datetime.datetime.now()),
     }
-    return render(request, 'webay/closed_auctions.html', context)
+    return render(request, 'webay/auctions.html', context)
+
 
 def auctions(request):
     context = {
-        'items':Item.objects.filter(end_datetime__gte=datetime.datetime.now())
+        'items': Item.objects.filter(end_datetime__gte=datetime.datetime.now())
     }
-    return render(request, 'webay/auctions.html', context) 
+    return render(request, 'webay/auctions.html', context)
+
 
 def item_view(request, item_id):
-    auc_item = Item.objects.get(id=item_id)
-    if Bid.objects.filter(item=item_id).exists():
-        bids = Bid.objects.filter(item=item_id)
-        highest_amount = Bid.objects.filter(item=item_id).order_by('-amount')[0].amount
-    else:
-        highest_amount = auc_item.base_price
-        bids = {}
-    context = {
-        'bids': bids,
-        'highest_bid': highest_amount,
-        'auction_item': auc_item,
-        'now_DateTime' :  datetime.datetime.now()
-    }
-    return render(request, 'webay/item_detail.html', context)
-
-@csrf_exempt
-@login_required
-def deleteItem(request, item_id):
-    id = int(QueryDict(request.body).get('id'))
-    item_del = Item.objects.get(id=id)
-    item_del.delete()
-    response = JsonResponse({
-        'result': 'success'
-    })
-    response.status_code = 200
-    render(request, 'webay/auctions.html')
-    # not sure about the return but would make sense that the website goes to all open auctions
-
-@csrf_exempt
-@login_required
-def bidItem(request, item_id):
-    amount = int(QueryDict(request.body).get('amount'))
-    auc_item = Item.objects.get(id=item_id)
-    bid_time = datetime.datetime.now()
-    bids = Bid.objects.filter(item=item_id)
-    bid_user = request.user
-    if Bid.objects.filter(item=item_id).filter(user=bid_user).exists():
-        highest_bid_user = Bid.objects.filter(item=item_id).filter(user=bid_user).order_by('-amount')[0]
-        highest_bid_user.amount = amount
-        highest_bid_user.bid_datetime = bid_time
-        highest_bid_user.save()
+    if request.method == 'GET':
+        auc_item = Item.objects.get(id=item_id)
         context = {
-            'bids': bids,
-            'highest_bid': amount,
             'auction_item': auc_item,
-            'now_DateTime' :  datetime.datetime.now()
+            'auction_ended': auc_item.end_datetime > auc_item.start_datetime
         }
         return render(request, 'webay/item_detail.html', context)
-        # not sure about the return ?
-    else:
-        new_bid = Bid(amount = amount ,bid_datetime = bid_time, item = auc_item,user=bid_user )
-        new_bid.save()
-        context = {
-            'bids': bids,
-            'highest_bid': amount,
-            'auction_item': auc_item,
-            'now_DateTime' :  datetime.datetime.now()
-        }
-        return render(request, 'webay/item_detail.html', context)
-        # not sure about the return?
+    elif request.method == 'DELETE':
+        Item.objects.get(id=item_id).delete()
+        return HttpResponse(status=200)
+    elif request.method == 'POST':
+        request_data = request.POST
+        highest_bid = Bid.objects.all().order_by('-amount').first().amount
+        amount = request_data['amount']
+        if highest_bid is not None:
+            if float(highest_bid) > float(amount):
+                return HttpResponse(status=400, content="Bid amount needs to be higher than £{}.".format(highest_bid))
+
+        bid = Bid(
+            amount=request_data['amount'],
+            bid_datetime=timezone.now(),
+            item=Item.objects.get(id=request_data['item_id']),
+            user=request.user
+        )
+        bid.save()
+        return HttpResponse(status=200)
+
+
+def get_all_bids(request, item_id):
+    item_chosen = Item.objects.get(id=item_id)
+    bids = Bid.objects.all().order_by('-amount').filter(item=item_chosen).values('amount', 'bid_datetime', 'user')
+
+    return JsonResponse(dict(bids=list(bids)))
+
 
 @user_passes_test(not_logged_in, login_url='/profile')
 def register(request):
@@ -122,13 +104,24 @@ def register(request):
 
 
 @login_required
+def get_my_items(request):
+    return JsonResponse(dict(items=list(
+        Item.objects.filter(user=request.user.id).values('id', 'title'))))
+
+
+@login_required
 def profile(request):
+    user_form = UserForm()
+    profile_form = UserProfileForm()
+    image_form = ProfileImageForm()
     return render(request, 'webay/profile_form.html',
                   {
                       'user_form': user_form,
                       'profile_form': profile_form,
                       'image_form': image_form,
                   })
+
+
 @login_required
 def add_item(request):
     user = User.objects.get(pk=request.user.pk)
@@ -223,20 +216,23 @@ def mark_notification_as_read(request, id):
     return HttpResponse(status=200)
 
 
-def display_notifications(request):
-    return render(request, "webay/notifications.html")
+def display_profile_table(request):
+    return render(request, "webay/profile_table.html")
 
 
 def search(request):
     if request.method == 'POST':
         search = request.POST['search']
         print(search)
-        try: itemSearch = Item.objects.all().filter(title__contains=search)
-        except Item.DoesNotExist: raise Http404('Item does not exist')
+        try:
+            itemSearch = Item.objects.all().filter(title__contains=search, end_datetime__gte=datetime.datetime.now()) | \
+                         Item.objects.all().filter(description__contains=search, end_datetime__gte=datetime.datetime.now())
+        except Item.DoesNotExist:
+            raise Http404('Item does not exist')
 
-        return render(request, 'webay/searchitems.html', {'itemSearch':itemSearch,})
+        return render(request, 'webay/searchitems.html', {'itemSearch': itemSearch, })
     else:
-        raise Http404('search not found') 
+        raise Http404('search not found')
 
 
 @login_required
