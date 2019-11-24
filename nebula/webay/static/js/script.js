@@ -1,4 +1,7 @@
 $(document).ready(() => {
+    if (window.location.pathname === '/closedauctions/') {
+        $('#searchBar').remove()
+    }
     $('#id_dob').attr('type', 'date');
     //$('#id_end_datetime').attr('type', 'datetime-local');
     $('#id_end_datetime').datetimepicker({
@@ -22,69 +25,36 @@ $(document).ready(() => {
         readURL(this);
     });
 
-    getUnreadNotifNumber().done(data =>{
-        if(data>0){
+    getUnreadNotifNumber().done(data => {
+        if (data > 0) {
             notifBadge = '<span class="notif-badge badge badge-info ml-2">' + data + '</span>';
             $('#navbarDropdownMenuLink').append(notifBadge);
             $('#notificationBtn').append(notifBadge);
             $('#notificationNavLink').append(notifBadge);
 
         }
-    })
-
-    $(".deleteButton").on("click", function(){
-        // console.log($(this).attr('id'));
-        const id = this.id;
-        console.log("this is item id:" +id)
-        deleteItemUrl = `/deleteItem/${id}`
-        const dataObj = {
-            'id' : id 
-        }
-        $.ajax({
-            url: deleteItemUrl,
-            method:"DELETE",
-            data: dataObj,
-            success: ()=>{
-                //redirect back to all page?
-                alert("this delete worked")
-            },
-            error: ()=>{
-                alert("this delete for item did not work");
-                //stay on page
-            }
-
-        })
     });
 
-    $(".addBid").on("click", function(){
-        const id = this.id;
-        // console.log("this is item id:" +id);
-        const bidItemUrl = `/bidItem/${id}`;
-        const bidAmount = $("#bidAmount").val();
-        const limit = $("#highestTag").val()
-        const dataObj = {
-            'id' : id,
-            'amount' : bidAmount,
-            'bidder' : bidUser,
+    $("#searchButton").click(function () {
 
-        }
-        console.log(dataObj);
+        event.preventDefault();
+
         $.ajax({
-            url: bidItemUrl,
-            method:"PUT",
-            data: dataObj,
-            success: ()=>{
-                alert("this bid worked. Yay!");
+            type: 'POST',
+            url: '/search/',
+            data: {'search': $('#search').val(), 'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()},
+            success: handleSuccess,
+            error: handleError
+        });
 
+        function handleSuccess(data) {
+            $('#search-results').html(data);
+        }
 
-            },
-            error: ()=>{
-                alert("The bid for item did not work. Contact your admin :D");
-                //stay on page
-            }
-
-        })
-    })
+        function handleError(ThrowError) {
+            console.log(ThrowError);
+        }
+    });
 });
 
 function getUnreadNotifNumber() {
@@ -97,7 +67,6 @@ function getUnreadNotifNumber() {
 //UPLOADING IMAGE USING AJAX.
 $(function () {
     $('#img_file').change(function uploadFile() {
-        console.log('yooo');
         const formdata = new FormData();
         const file = document.getElementById('img_file').files[0];
         formdata.append('img_file', file);
@@ -109,37 +78,12 @@ $(function () {
             success: function (data) {
                 $('#profile-img').attr("src", data);
             },
-            error: error =>{
+            error: error => {
+                alert('Picture not updated');
                 console.log('error', error)
             },
             processData: false,
             contentType: false,
         });
     });
-});
-
-
-$(document).ready(function(){
-    $("#searchButton").click(function() {
-
-    event.preventDefault();
-
-$.ajax({
-    type: 'POST',
-    url: '/search/',
-    data:{'search' :$('#search').val(), 'csrfmiddlewaretoken' : $('input[name=csrfmiddlewaretoken]').val()},
-    success: handleSuccess,
-    error: handleError
-
-
-});
-    function handleSuccess(data){
-        console.log(data)
-        $('#search-results').html(data);
-    }
-
-    function handleError(ThrowError){
-        console.log(ThrowError);
-    }
-  });  
 });

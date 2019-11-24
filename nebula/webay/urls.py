@@ -1,18 +1,18 @@
-from django.urls import path, include
-from . import views
 from django.contrib.auth import views as auth_views
+from django.urls import path
+
+from . import views
+
 # will deleteItemView and DeleteView
 
-app_name='webay'
+app_name = 'webay'
 
 urlpatterns = [
-    path('index', views.index, name='index'),
-    path('', views.auctions, name='auctions'),
+    path('', views.index, name='homepage'),
     path('item/<int:item_id>/', views.item_view, name='item-detail'),
-    path('deleteItem/<int:item_id>', views.deleteItem, name='deleteItem'),
-    path('bidItem/<int:item_id>', views.bidItem, name='bidItem'),
+    path('getAllBids/<int:item_id>/', views.get_all_bids, name='get_all_bids'),
     path('openauctions/', views.auctions, name='auctions'),
-    path('closedauctions/',views.closed_auctions, name='closedauctions'),
+    path('closedauctions/', views.closed_auctions, name='closedauctions'),
     path('register/', views.register, name='register'),
     path('profile/', views.profile, name='profile'),
     path('getUserDetails/', views.get_user_details, name='get_user_details'),
@@ -22,9 +22,11 @@ urlpatterns = [
     path('getNotificationMessage/<int:id>', views.get_notifications_message, name='get_notifications_message'),
     path('markNotificationAsRead/<int:id>', views.mark_notification_as_read, name='mark_notif_read'),
     path('getUnreadNotifNumber/', views.get_number_unread_notifs, name='get_number_unread_notifs'),
-    path('notifications/', views.display_notifications, name='display_notifications'),
+    path('notifications/', views.display_profile_table, name='display_notifications'),
     path('login/', auth_views.LoginView.as_view(template_name='webay/login.html'), name='login'),
     path('logout/', views.logout, name="logout"),
     path('additem/', views.add_item, name='additem'),
     path('search/', views.search, name='search'),
+    path('getMyItems/', views.get_my_items, name='myitems'),
+    path('myItems/', views.display_profile_table, name='display_my_items')
 ]

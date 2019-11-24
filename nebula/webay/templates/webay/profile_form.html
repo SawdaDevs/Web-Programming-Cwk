@@ -1,7 +1,7 @@
 {% extends 'webay/base_profile.html' %}
 {% block content %}
 {% load crispy_forms_tags %}
-<form id="updateProfileDetails"enctype="multipart/form-data" method="POST">
+<form id="updateProfileDetails" enctype="multipart/form-data" method="POST">
     {% csrf_token %}
     {{ user_form|crispy }}
     {{ profile_form|crispy }}
